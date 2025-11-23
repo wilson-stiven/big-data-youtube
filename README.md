@@ -3,9 +3,7 @@
 ## 📊 Proyecto: Análisis de YouTube Analytics con MongoDB
 
 ### 👥 Integrantes del Grupo
-- [Nombre Estudiante 1]
-- [Nombre Estudiante 2]
-- [Nombre Estudiante 3]
+- Wilson Stiven Rojas Diaz
 
 **Curso:** Big Data (202016911)  
 **Universidad:** UNAD - Universidad Nacional Abierta y a Distancia  
@@ -15,56 +13,121 @@
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto implementa una base de datos NoSQL en **MongoDB** utilizando el dataset *YouTube Analytics Data* de Kaggle.  
-El conjunto de datos contiene más de **537 videos** con información relevante como vistas, likes, comentarios, fecha de publicación, métricas derivadas y características del canal.
+Este proyecto desarrolla una base de datos NoSQL en **MongoDB** utilizando el dataset *YouTube Analytics Data* proveniente de Kaggle.  
+Se analiza información de 537 videos, incluyendo vistas, likes, comentarios, categorías, métricas de engagement y datos del canal.
 
-MongoDB permite almacenar este tipo de información semi–estructurada mediante documentos JSON flexibles y consultas potentes utilizando agregaciones.
+MongoDB es una herramienta adecuada para este tipo de datos porque permite almacenar información semi–estructurada en documentos flexibles y realizar consultas avanzadas utilizando agregaciones.
 
-### 🎯 Objetivos del Proyecto
+---
 
-- Comparar los principales tipos de bases de datos NoSQL.
-- Diseñar e implementar una base de datos NoSQL en MongoDB.
-- Realizar consultas CRUD y consultas con operadores `$expr`.
-- Aplicar agregaciones para analizar patrones de comportamiento en YouTube.
-- Calcular métricas de engagement, tendencias y popularidad.
+## 🎯 Objetivos del Proyecto
+
+- Comparar los principales modelos de bases de datos NoSQL.  
+- Diseñar un modelo orientado a documentos para datos de YouTube.  
+- Importar datos reales a MongoDB utilizando MongoDB Compass.  
+- Ejecutar consultas CRUD, filtros con `$expr` y agregaciones.  
+- Analizar métricas de popularidad y engagement en YouTube.
 
 ---
 
 ## 🗄️ Dataset Utilizado
 
-**Fuente del Dataset:**  
+**Fuente:**  
 https://www.kaggle.com/datasets/shaistashahid/youtube-analytics-data
 
-**Número de registros:** 537  
+**Registros:** 537 videos  
 **Principales campos:**
-
-- `Title` — Título del video  
-- `channel_title` — Nombre del canal  
-- `published_at` — Fecha de publicación  
-- `category_id` — Categoría de YouTube  
-- `view_count` — Cantidad de vistas  
-- `like_count` — Likes recibidos  
-- `comment_count` — Comentarios recibidos  
-- `engagement_rate` — Métrica derivada  
-- `duration_seconds` — Duración del video  
+- Title  
+- channel_title  
+- published_at  
+- view_count  
+- like_count  
+- comment_count  
+- category_id  
+- engagement_rate  
 
 ---
 
 ## 🚀 Instalación y Configuración
 
-### 🔧 Requisitos Previos
+### 1️⃣ Instalar MongoDB Community Server
 
-- MongoDB 6.0 o superior  
-- MongoDB Shell (mongosh)  
-- MongoDB Compass (opcional)  
-- Git y terminal bash  
+Descargar desde el sitio oficial:  
+https://www.mongodb.com/try/download/community
+
+Durante la instalación se seleccionó:
+
+- **MongoDB Server**
+- **MongoDB Compass** (interfaz gráfica)
+
+### 2️⃣ Abrir MongoDB Compass
+
+Se abre desde el menú de Windows como **MongoDB Compass**.
+
+### 3️⃣ Crear la base de datos
+
+En Compass:
+
+1. Clic en **"Create Database"**  
+2. Nombre de la base: **base_youtube**  
+3. Nombre de la colección: **youtube_video**
+
+### 4️⃣ Importar el dataset
+
+1. Abrir la colección `youtube_video`
+2. Clic en **"ADD DATA"**
+3. Seleccionar **"Import Data"**
+4. Elegir el archivo CSV descargado de Kaggle
+5. Confirmar la importación
+
+✔ Esto cargó las **537 filas** en MongoDB sin usar comandos de consola.
 
 ---
 
-## 🛠 Pasos para Reproducir el Proyecto
 
-### 1️⃣ Clonar el repositorio
+---
 
-```bash
-git clone https://github.com/[tu-usuario]/tarea4-mongodb-youtube.git
-cd tarea4-mongodb-youtube
+## 🔍 Consultas Realizadas
+
+### ✔ Operaciones CRUD
+- Insertar documentos  
+- Consultar datos  
+- Actualizar campos  
+- Eliminar registros  
+
+### ✔ Consultas con `$expr`
+- Likes > Comentarios  
+- Likes = Comentarios  
+- Likes < Comentarios  
+- Comparación entre tasa de likes y tasa de comentarios  
+- Videos con +100k vistas y likes > comentarios  
+
+### ✔ Agregaciones
+1. Conteo de videos por categoría  
+2. Promedio de vistas por categoría  
+3. Top 10 videos más vistos  
+4. Engagement promedio por canal  
+
+---
+
+## 📊 Principales Resultados
+
+- **Categoría predominante:** ID 27 (150 videos)  
+- **Video más visto:** *“Making a beat with a BABY!”* – 369M vistas  
+- **Canal con mayor engagement:** FactTechz  
+- **Contenido dominante:** Formato tipo YouTube Shorts  
+
+---
+
+## 📝 Referencias
+
+- MongoDB Documentation (2024)  
+- Dataset: YouTube Analytics – Kaggle  
+- Evaluación comparativa de bases NoSQL (Miranda et al., 2023)
+
+---
+
+## 👨‍💻 Autores
+Wilson stiven rojas diaz
+Proyecto desarrollado para el curso Big Data – UNAD  
+Noviembre 2025
