@@ -1,25 +1,6 @@
- scripts/02_consultas_crud.js
-javascript// ============================================
-// CONSULTAS CRUD - OPERACIONES BÁSICAS
-// Curso: Big Data - UNAD
-// Tarea 4 - MongoDB YouTube Analytics
-// ============================================
-
-use base_youtube
-
-print("╔══════════════════════════════════════╗")
-print("║   CONSULTAS CRUD EN MONGODB         ║")
-print("╚══════════════════════════════════════╝\n")
-
-// ═══════════════════════════════════════════
-// 1. CREATE - INSERCIÓN DE DOCUMENTOS
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("1️⃣  INSERT - Inserción de documento")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var resultadoInsert = db.youtube_video.insertOne({
+# sConsultas CRUD
+INSERT
+db.youtube_video.insertOne({
   Title: "Video Prueba",
   channel_title: "TestChannel",
   published_at: new Date(),
@@ -34,560 +15,102 @@ var resultadoInsert = db.youtube_video.insertOne({
   video_age_days: 0
 })
 
-print("✅ Documento insertado exitosamente")
-print("📌 ID generado:", resultadoInsert.insertedId)
-print()
+# FIND
+db.youtube_video.find().limit(5)
 
-// ═══════════════════════════════════════════
-// 2. READ - LECTURA DE DOCUMENTOS
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("2️⃣  FIND - Lectura de documentos")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("📄 Primeros 5 documentos de la colección:\n")
-db.youtube_video.find().limit(5).pretty()
-
-print("\n📄 Buscando el documento insertado:\n")
-db.youtube_video.find({ Title: "Video Prueba" }).pretty()
-
-var totalDocs = db.youtube_video.countDocuments()
-print("\n📊 Total de documentos en la colección:", totalDocs)
-print()
-
-// ═══════════════════════════════════════════
-// 3. UPDATE - ACTUALIZACIÓN DE DOCUMENTOS
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("3️⃣  UPDATE - Actualización de documento")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var resultadoUpdate = db.youtube_video.updateOne(
+# UPDATE
+db.youtube_video.updateOne(
   { Title: "Video Prueba" },
   { $set: { view_count: 5000, like_count: 300 } }
 )
 
-print("✅ Documento actualizado")
-print("📊 Documentos modificados:", resultadoUpdate.modifiedCount)
+# DELETE
+db.youtube_video.deleteOne({ Title: "Video Prueba" })
 
-print("\n📄 Documento después de actualizar:\n")
-db.youtube_video.find({ Title: "Video Prueba" }).pretty()
-print()
+# 4. Consultas usando $expr
+Likes > Comentarios
+{ $expr: { $gt: ["$like_count", "$comment_count"] } }
 
-// ═══════════════════════════════════════════
-// 4. DELETE - ELIMINACIÓN DE DOCUMENTOS
-// ═══════════════════════════════════════════
+ # Likes < Comentarios
+{ $expr: { $lt: ["$like_count", "$comment_count"] } }
 
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("4️⃣  DELETE - Eliminación de documento")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+# Likes = Comentarios
+{ $expr: { $eq: ["$like_count", "$comment_count"] } }
 
-var resultadoDelete = db.youtube_video.deleteOne({ Title: "Video Prueba" })
-
-print("✅ Documento eliminado")
-print("📊 Documentos eliminados:", resultadoDelete.deletedCount)
-
-// Verificar eliminación
-var existe = db.youtube_video.countDocuments({ Title: "Video Prueba" })
-print("🔍 Verificación - Documentos con ese título:", existe)
-print()
-
-print("╔══════════════════════════════════════╗")
-print("║  ✅ OPERACIONES CRUD COMPLETADAS    ║")
-print("╚══════════════════════════════════════╝")
-
-📄 ARCHIVO 2: scripts/03_consultas_filtros.js
-javascript// ============================================
-// CONSULTAS CON FILTROS Y OPERADORES $expr
-// Curso: Big Data - UNAD
-// Tarea 4 - MongoDB YouTube Analytics
-// ============================================
-
-use base_youtube
-
-print("╔══════════════════════════════════════════════╗")
-print("║  CONSULTAS CON FILTROS Y OPERADORES $expr  ║")
-print("╚══════════════════════════════════════════════╝\n")
-
-// ═══════════════════════════════════════════
-// CONSULTA 1: Videos donde Likes > Comentarios
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 CONSULTA 1: Videos donde Likes > Comentarios")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("🔍 Filtro aplicado: { $expr: { $gt: ['$like_count', '$comment_count'] } }\n")
-
-var resultado1 = db.youtube_video.find({
-  $expr: { $gt: ["$like_count", "$comment_count"] }
-}).limit(5)
-
-print("📄 Primeros 5 resultados:\n")
-resultado1.forEach(doc => {
-  print(`  ▪ ${doc.Title}`)
-  print(`    👍 Likes: ${doc.like_count} | 💬 Comentarios: ${doc.comment_count}`)
-  print()
-})
-
-var count1 = db.youtube_video.countDocuments({
-  $expr: { $gt: ["$like_count", "$comment_count"] }
-})
-print(`📈 Total de videos con más likes que comentarios: ${count1}\n`)
-
-// ═══════════════════════════════════════════
-// CONSULTA 2: Videos donde Likes < Comentarios
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 CONSULTA 2: Videos donde Likes < Comentarios")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("🔍 Filtro aplicado: { $expr: { $lt: ['$like_count', '$comment_count'] } }\n")
-
-var resultado2 = db.youtube_video.find({
-  $expr: { $lt: ["$like_count", "$comment_count"] }
-}).limit(5)
-
-print("📄 Primeros 5 resultados:\n")
-resultado2.forEach(doc => {
-  print(`  ▪ ${doc.Title}`)
-  print(`    👍 Likes: ${doc.like_count} | 💬 Comentarios: ${doc.comment_count}`)
-  print()
-})
-
-var count2 = db.youtube_video.countDocuments({
-  $expr: { $lt: ["$like_count", "$comment_count"] }
-})
-print(`📈 Total de videos con más comentarios que likes: ${count2}\n`)
-
-// ═══════════════════════════════════════════
-// CONSULTA 3: Videos donde Likes = Comentarios
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 CONSULTA 3: Videos donde Likes = Comentarios")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("🔍 Filtro aplicado: { $expr: { $eq: ['$like_count', '$comment_count'] } }\n")
-
-var resultado3 = db.youtube_video.find({
-  $expr: { $eq: ["$like_count", "$comment_count"] }
-})
-
-var count3 = db.youtube_video.countDocuments({
-  $expr: { $eq: ["$like_count", "$comment_count"] }
-})
-
-if (count3 > 0) {
-  print("📄 Videos encontrados:\n")
-  resultado3.forEach(doc => {
-    print(`  ▪ ${doc.Title}`)
-    print(`    👍 Likes: ${doc.like_count} | 💬 Comentarios: ${doc.comment_count}`)
-    print()
-  })
-} else {
-  print("❌ No se encontraron videos con likes exactamente iguales a comentarios\n")
+Ratio likes > ratio comentarios
+{
+  $expr: { 
+    $gt: ["$likes_to_views_ratio", "$comments_to_views_ratio"] 
+  }
 }
 
-print(`📈 Total de videos: ${count3}\n`)
-
-// ═══════════════════════════════════════════
-// CONSULTA 4: Ratio Likes > Ratio Comentarios
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 CONSULTA 4: Videos con ratio de likes > ratio comentarios")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("🔍 Filtro: { $expr: { $gt: ['$likes_to_views_ratio', '$comments_to_views_ratio'] } }\n")
-
-var resultado4 = db.youtube_video.find({
-  $expr: { 
-    $gt: ["$likes_to_views_ratio", "$comments_to_views_ratio"] 
-  }
-}).limit(5)
-
-print("📄 Primeros 5 resultados:\n")
-resultado4.forEach(doc => {
-  print(`  ▪ ${doc.Title}`)
-  print(`    📊 Ratio Likes: ${doc.likes_to_views_ratio.toFixed(4)}`)
-  print(`    📊 Ratio Comentarios: ${doc.comments_to_views_ratio.toFixed(4)}`)
-  print()
-})
-
-var count4 = db.youtube_video.countDocuments({
-  $expr: { 
-    $gt: ["$likes_to_views_ratio", "$comments_to_views_ratio"] 
-  }
-})
-print(`📈 Total de videos: ${count4}`)
-print("💡 Interpretación: Videos con mayor interacción emocional (likes) que discursiva (comentarios)\n")
-
-// ═══════════════════════════════════════════
-// CONSULTA 5: Videos populares con condición AND
-// ═══════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 CONSULTA 5: Videos con +100k vistas Y más likes que comentarios")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-print("🔍 Filtro: { $expr: { $and: [ ... ] } }\n")
-
-var resultado5 = db.youtube_video.find({
+# Videos con +100k vistas y más likes que comentarios
+{
   $expr: { 
     $and: [
       { $gt: ["$view_count", 100000] },
       { $gt: ["$like_count", "$comment_count"] }
     ] 
   }
-}).limit(5)
+}
 
-print("📄 Primeros 5 resultados:\n")
-resultado5.forEach(doc => {
-  print(`  ▪ ${doc.Title}`)
-  print(`    👁️ Vistas: ${doc.view_count.toLocaleString()}`)
-  print(`    👍 Likes: ${doc.like_count} | 💬 Comentarios: ${doc.comment_count}`)
-  print()
-})
-
-var count5 = db.youtube_video.countDocuments({
-  $expr: { 
-    $and: [
-      { $gt: ["$view_count", 100000] },
-      { $gt: ["$like_count", "$comment_count"] }
-    ] 
-  }
-})
-print(`📈 Total de videos populares con esta característica: ${count5}`)
-print("💡 Interpretación: Videos virales con alto engagement positivo\n")
-
-print("╔═══════════════════════════════════════╗")
-print("║  ✅ CONSULTAS CON FILTROS COMPLETADAS ║")
-print("╚═══════════════════════════════════════╝")
-
-📄 ARCHIVO 3: scripts/04_agregaciones.js
-javascript// ============================================
-// CONSULTAS DE AGREGACIÓN
-// Curso: Big Data - UNAD
-// Tarea 4 - MongoDB YouTube Analytics
-// ============================================
-
-use base_youtube
-
-print("╔════════════════════════════════════════╗")
-print("║    CONSULTAS DE AGREGACIÓN            ║")
-print("╚════════════════════════════════════════╝\n")
-
-// ═══════════════════════════════════════════════════════
-// AGREGACIÓN 1: Conteo de videos por categoría
-// ═══════════════════════════════════════════════════════
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 AGREGACIÓN 1: Conteo de videos por categoría")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var agregacion1 = db.youtube_video.aggregate([
-  { $group: { 
-      _id: "$category_id", 
-      cantidad: { $sum: 1 } 
-  }},
+# 5. Consultas de Agregación
+# 5.1 Conteo de videos por categoría
+db.youtube_video.aggregate([
+  { $group: { _id: "$category_id", cantidad: { $sum: 1 } } },
   { $sort: { cantidad: -1 } }
 ])
 
-print("📈 Resultados:\n")
-agregacion1.forEach(cat => {
-  print(`  Categoría ${cat._id}: ${cat.cantidad} videos`)
-})
+# Análisis
 
-print("\n💡 ANÁLISIS:")
-print("  • Categoría 27 → más frecuente con 150 videos (27.9% del dataset)")
-print("  • Categoría 22 → segunda con 99 videos")
-print("  • Concentración significativa en pocas categorías\n")
+Categoría 27 es la más frecuente con 150 videos
 
-// ═══════════════════════════════════════════════════════
-// AGREGACIÓN 2: Promedio de vistas por categoría
-// ═══════════════════════════════════════════════════════
+Representa el 27.9% del dataset
 
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 AGREGACIÓN 2: Promedio de vistas por categoría")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+Segunda categoría: 22 con 99 videos
 
-var agregacion2 = db.youtube_video.aggregate([
-  { $group: { 
-      _id: "$category_id", 
-      promedio_vistas: { $avg: "$view_count" } 
-  }},
-  { $project: { 
-      promedio_vistas: { $round: ["$promedio_vistas", 2] } 
-  }},
+# 5.2 Promedio de vistas por categoría
+db.youtube_video.aggregate([
+  { $group: { _id: "$category_id", promedio_vistas: { $avg: "$view_count" } } },
+  { $project: { promedio_vistas: { $round: ["$promedio_vistas", 2] } } },
   { $sort: { promedio_vistas: -1 } }
 ])
 
-print("📈 Resultados:\n")
-agregacion2.forEach(cat => {
-  var vistas = cat.promedio_vistas.toLocaleString()
-  print(`  Categoría ${cat._id}: ${vistas} vistas promedio`)
-})
+# Análisis
 
-print("\n💡 ANÁLISIS:")
-print("  • Categoría 17 → 54.8 millones de vistas promedio (líder absoluto)")
-print("  • Categoría 26 → 52.7 millones de vistas promedio")
-print("  • Estas categorías tienen contenido altamente viral\n")
+Categoría 17 → 54.8 millones promedio
 
-// ═══════════════════════════════════════════════════════
-// AGREGACIÓN 3: Top 10 videos más vistos
-// ═══════════════════════════════════════════════════════
+Categoría 26 → 52.7 millones promedio
 
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 AGREGACIÓN 3: Top 10 videos más vistos")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var agregacion3 = db.youtube_video.aggregate([
+# 5.3 Top 10 videos más vistos
+db.youtube_video.aggregate([
   { $sort: { view_count: -1 } },
   { $limit: 10 },
-  { $project: { 
-      _id: 0, 
-      Title: 1, 
-      channel_title: 1, 
-      view_count: 1, 
-      like_count: 1, 
-      comment_count: 1 
-  }}
+  { $project: { _id: 0, Title: 1, channel_title: 1, view_count: 1, like_count: 1, comment_count: 1 } }
 ])
 
-print("🏆 Top 10:\n")
-var posicion = 1
-agregacion3.forEach(video => {
-  print(`${posicion}. "${video.Title}"`)
-  print(`   📺 Canal: ${video.channel_title}`)
-  print(`   👁️ Vistas: ${video.view_count.toLocaleString()}`)
-  print(`   👍 Likes: ${video.like_count.toLocaleString()} | 💬 Comentarios: ${video.comment_count.toLocaleString()}`)
-  print()
-  posicion++
-})
+# Análisis
 
-print("💡 ANÁLISIS:")
-print("  • Video #1: 'Making a beat with a BABY!' → 369 millones de vistas")
-print("  • Predominio de contenido tipo YouTube Shorts (viral)")
-print("  • Alto engagement en formato corto y entretenimiento\n")
+#1: “Making a beat with a BABY!” → 369M vistas
 
-// ═══════════════════════════════════════════════════════
-// AGREGACIÓN 4: Engagement promedio por canal
-// ═══════════════════════════════════════════════════════
+Contenido mayormente tipo YouTube Shorts
 
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 AGREGACIÓN 4: Engagement promedio por canal")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var agregacion4 = db.youtube_video.aggregate([
+# 5.4 Engagement promedio por canal
+db.youtube_video.aggregate([
   { $group: {
       _id: "$channel_title",
       engagement_promedio: { $avg: "$engagement_rate" },
       videos: { $sum: 1 }
   }},
-  { $match: { videos: { $gte: 3 } }}, // Mínimo 3 videos
+  { $match: { videos: { $gte: 3 } } },
   { $sort: { engagement_promedio: -1 } },
   { $limit: 15 }
 ])
 
-print("🏆 Top 15 canales por engagement:\n")
-var pos = 1
-agregacion4.forEach(canal => {
-  var engagement = (canal.engagement_promedio * 100).toFixed(2)
-  print(`${pos}. ${canal._id}`)
-  print(`   📊 Engagement: ${engagement}% | 📹 Videos: ${canal.videos}`)
-  print()
-  pos++
-})
+# Análisis
 
-print("💡 ANÁLISIS:")
-print("  • FactTechz → mayor engagement (6.01%)")
-print("  • Fireship → 4.67%, muy consistente en contenido técnico")
-print("  • Apna College → 18 videos con engagement de 4.33%")
-print("  • Canales educativos/técnicos destacan en interacción\n")
+FactTechz → mayor engagement (0.0601)
 
-// ═══════════════════════════════════════════════════════
-// ESTADÍSTICAS GENERALES DEL DATASET
-// ═══════════════════════════════════════════════════════
+Fireship → 0.0467, muy consistente
 
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("📊 ESTADÍSTICAS GENERALES DEL DATASET")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-var stats = db.youtube_video.aggregate([
-  { $group: {
-      _id: null,
-      total_videos: { $sum: 1 },
-      total_vistas: { $sum: "$view_count" },
-      promedio_vistas: { $avg: "$view_count" },
-      promedio_likes: { $avg: "$like_count" },
-      promedio_comentarios: { $avg: "$comment_count" },
-      max_vistas: { $max: "$view_count" },
-      min_vistas: { $min: "$view_count" }
-  }},
-  { $project: {
-      _id: 0,
-      total_videos: 1,
-      total_vistas: 1,
-      promedio_vistas: { $round: ["$promedio_vistas", 2] },
-      promedio_likes: { $round: ["$promedio_likes", 2] },
-      promedio_comentarios: { $round: ["$promedio_comentarios", 2] },
-      max_vistas: 1,
-      min_vistas: 1
-  }}
-]).toArray()[0]
-
-print("📈 Resumen completo:")
-print(`  • Total de videos: ${stats.total_videos}`)
-print(`  • Total de vistas acumuladas: ${stats.total_vistas.toLocaleString()}`)
-print(`  • Promedio de vistas: ${stats.promedio_vistas.toLocaleString()}`)
-print(`  • Promedio de likes: ${stats.promedio_likes.toLocaleString()}`)
-print(`  • Promedio de comentarios: ${stats.promedio_comentarios.toLocaleString()}`)
-print(`  • Video más visto: ${stats.max_vistas.toLocaleString()} vistas`)
-print(`  • Video menos visto: ${stats.min_vistas.toLocaleString()} vistas\n`)
-
-print("╔════════════════════════════════════════╗")
-print("║  ✅ AGREGACIONES COMPLETADAS          ║")
-print("╚════════════════════════════════════════╝")
-
-📄 ARCHIVO 4: resultados/analisis_resultados.md
-markdown# 📊 Análisis de Resultados - MongoDB YouTube Analytics
-
-## Resumen del Dataset
-- **Total de videos:** 537
-- **Fuente:** [Kaggle - YouTube Analytics Data](https://www.kaggle.com/datasets/shaistashahid/youtube-analytics-data)
-- **Período:** Videos recientes de YouTube
-- **Campos principales:** Title, channel_title, category_id, view_count, like_count, comment_count, engagement_rate
-
----
-
-## 1️⃣ Agregación 1: Conteo de videos por categoría
-
-### Resultados Principales
-| Categoría | Cantidad de Videos | Porcentaje |
-|-----------|-------------------|------------|
-| 27        | 150              | 27.9%      |
-| 22        | 99               | 18.4%      |
-| 24        | 78               | 14.5%      |
-
-### Análisis
-- La **categoría 27** domina el dataset con 150 videos (casi 28% del total)
-- Hay una **concentración significativa** en pocas categorías
-- La categoría 27 probablemente corresponde a **Entertainment** según la codificación de YouTube
-- Esta distribución indica que el dataset está sesgado hacia contenido de entretenimiento
-
-### Implicaciones
-- Ideal para análisis de tendencias en entretenimiento
-- Limitado para análisis comparativo entre categorías diversas
-- Útil para entender patrones de contenido viral
-
----
-
-## 2️⃣ Agregación 2: Promedio de vistas por categoría
-
-### Top 3 Categorías por Vistas Promedio
-| Categoría | Promedio de Vistas | Observación |
-|-----------|-------------------|-------------|
-| 17        | 54,800,000       | Líder absoluto |
-| 26        | 52,700,000       | Muy cercano |
-| Resto     | < 10,000,000     | Significativamente menor |
-
-### Análisis
-- Las categorías **17 y 26** son claramente las **más virales**
-- Superan por un factor de **5x** al resto de categorías
-- Diferencia masiva entre categorías top y promedio general
-- Estas categorías probablemente incluyen:
-  - **Categoría 17:** Sports (deportes)
-  - **Categoría 26:** Howto & Style
-
-### Insights Clave
-✅ El contenido de estas categorías tiene **mayor probabilidad de viralización**  
-✅ Canales que se especializan en estas áreas tienen **ventaja algorítmica**  
-✅ El tipo de contenido es **más compartible y recomendado** por YouTube
-
----
-
-## 3️⃣ Agregación 3: Top 10 videos más vistos
-
-### Video #1 - Líder Absoluto
-**Título:** "Making a beat with a BABY!"  
-**Canal:** SungBeats  
-**Vistas:** 369,000,000  
-**Características:**
-- Contenido de **entretenimiento + música**
-- Formato **viral y compartible**
-- Apelación a audiencia **universal** (familia, humor)
-
-### Patrón Dominante: YouTube Shorts
-- **Mayoría de videos** en el Top 10 son Shorts
-- Formato corto (< 1 minuto) facilita:
-  - Mayor retención
-  - Más compartidos
-  - Algoritmo favorece este formato
-- Uso intensivo de **emojis y hashtags** en títulos
-
-### Análisis Comparativo
-| Característica | Video #1 | Video #10 | Observación |
-|----------------|----------|-----------|-------------|
-| Vistas         | 369M     | ~50M      | Diferencia de 7x |
-| Formato        | Short    | Short     | 100% Shorts |
-| Engagement     | Alto     | Alto      | Consistente |
-
-### Conclusiones
-🎯 **Shorts domina la viralidad** en YouTube actualmente  
-🎯 Contenido **emocional/humorístico** genera más vistas  
-🎯 **Títulos con emojis** aumentan CTR (Click Through Rate)
-
----
-
-## 4️⃣ Agregación 4: Engagement promedio por canal
-
-### Top 3 Canales
-| Posición | Canal | Engagement | Videos | Nicho |
-|----------|-------|------------|--------|-------|
-| 1        | FactTechz | 6.01% | 3+ | Educativo/Curiosidades |
-| 2        | Fireship | 4.67% | 3+ | Programación/Tech |
-| 3        | Apna College | 4.33% | 18 | Educación/Cursos |
-
-### Análisis Profundo
-
-#### FactTechz (6.01% engagement)
-- **Nicho:** Datos curiosos, ciencia popular
-- **Por qué funciona:**
-  - Contenido breve y sorprendente
-  - Temas que generan conversación
-  - Audiencia fiel y activa
-- **Lección:** Educar + Entretener = Alto engagement
-
-#### Fireship (4.67% engagement)
-- **Nicho:** Programación, tecnología
-- **Por qué funciona:**
-  - Videos ultra-concisos (5-10 min)
-  - Alta densidad de información
-  - Comunidad técnica muy comprometida
-- **Lección:** Calidad > Cantidad en nichos específicos
-
-#### Apna College (4.33% engagement, 18 videos)
-- **Nicho:** Cursos de programación en India
-- **Por qué funciona:**
-  - Contenido educativo estructurado
-  - Audiencia estudiantil comprometida
-  - Constancia (18 videos mantienen engagement)
-- **Lección:** La consistencia genera comunidad leal
-
-### Patrón Identificado
-✅ **Canales educativos/técnicos** tienen mejor engagement que entretenimiento  
-✅ **Audiencia de nicho** es más activa que audiencia masiva  
-✅ **Constancia + Calidad** = Engagement sostenido
-
----
-
-## 🔍 Consultas con Filtros - Insights Adicionales
-
-### Videos con Likes > Comentarios
-- **Cantidad:** Mayoría del dataset
-- **Interpretación:** Contenido **emocional** más que **discursivo**
-- **Tipo
+Apna College → 18 videos y alto engagement
